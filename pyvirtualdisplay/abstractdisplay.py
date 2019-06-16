@@ -28,13 +28,16 @@ class AbstractDisplay(EasyProcess):
     '''
     Common parent for Xvfb and Xephyr
     '''
-    def __init__(self, use_xauth=False, check_startup=False, randomizer=None):
-        with mutex:
-            self.display = self.search_for_display(randomizer=randomizer)
-            while self.display in USED_DISPLAY_NR_LIST:
-                self.display+=1
+    def __init__(self, use_xauth=False, check_startup=False, randomizer=None, display=None):
+        if display:
+            self.display = display
+        else:
+            with mutex:
+                self.display = self.search_for_display(randomizer=randomizer)
+                while self.display in USED_DISPLAY_NR_LIST:
+                    self.display+=1
 
-            USED_DISPLAY_NR_LIST.append(self.display)
+        USED_DISPLAY_NR_LIST.append(self.display)
 
         if use_xauth and not xauth.is_installed():
             raise xauth.NotFoundError()
